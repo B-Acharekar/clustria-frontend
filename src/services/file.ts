@@ -45,3 +45,9 @@ export const downloadFile = async (id: string) => {
   link.click();
   link.remove();
 };
+
+// Delete file
+export const deleteFile = async (id: string) => {
+  const res = await api.delete(`/${id}`);
+  return res.data;
+};

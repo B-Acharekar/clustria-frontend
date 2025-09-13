@@ -15,6 +15,7 @@ import CodePreview from "../preview/CodePreview";
 import CompressedPreview from "../preview/CompressedPreview";
 import FallbackPreview from "../preview/FallbackPreview";
 import { fileService } from "@/services/fileService";
+import { deleteFile } from "@/services/file";
 
 interface FilePreviewProps {
   file: any | null;
@@ -30,24 +31,21 @@ export default function FilePreview({ file, onClose }: FilePreviewProps) {
   const previewUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/files/${file._id}/download?preview=true`;
   const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/files/${file._id}/download`;
 
-  const handleDelete = async () => {
-    try {
-      setDeleting(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/files/${file._id}`,
-        { method: "DELETE" }
-      );
-      if (!res.ok) throw new Error("Failed to delete file");
-      setConfirmDelete(false);
-      onClose();
-      console.log("File deleted:", file._id);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete file");
-    } finally {
-      setDeleting(false);
-    }
-  };
+const handleDelete = async () => {
+  try {
+    setDeleting(true);
+    await deleteFile(file._id); // call the service
+    setConfirmDelete(false);
+    onClose();
+    console.log("File deleted:", file._id);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete file");
+  } finally {
+    setDeleting(false);
+  }
+};
+
 
   const renderPreview = () => {
     if (!ext) return <FallbackPreview file={file} previewUrl={previewUrl} />;
