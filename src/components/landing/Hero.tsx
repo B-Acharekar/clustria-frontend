@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { RetroGrid } from '@/components/magicui/retro-grid'
 
 export default function Hero() {
   return (
@@ -13,6 +14,9 @@ export default function Hero() {
 
       {/* Faint second glow for depth */}
       <div className="absolute bottom-10 right-20 w-72 h-72 bg-purple-500/10 blur-[120px] rounded-full z-0" />
+
+      {/* RetroGrid overlay */}
+      <RetroGrid className="absolute inset-0 z-0 opacity-20" />
 
       {/* Main content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto">

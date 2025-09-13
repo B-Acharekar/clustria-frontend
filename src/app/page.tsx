@@ -1,6 +1,6 @@
 import Navbar from '@/components/landing/Navbar'
 import Hero from '@/components/landing/Hero'
-import TrustedBy from '@/components/landing/TrustedBy'
+
 import Features from '@/components/landing/Features'
 import UseCases from '@/components/landing/UseCases'
 import FeedbackControl from '@/components/landing/FeedbackControl'
@@ -15,7 +15,6 @@ export default function Home() {
     <div className="bg-black text-white min-h-screen">
       <Navbar/>
       <Hero />
-      <TrustedBy />
       <Features />
       <UseCases />
       <FeedbackControl />
