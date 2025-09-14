@@ -10,7 +10,7 @@ import VideoPreview from "../preview/VideoPreview";
 import AudioPreview from "../preview/AudioPreview";
 import DocumentPreview from "../preview/DocumentPreview";
 import ExcelPreview from "../preview/ExcelPreview";
-import PPTPreview from "../preview/pptpreview";
+import PPTPreview from "../preview/PPTPreview";
 import CodePreview from "../preview/CodePreview";
 import CompressedPreview from "../preview/CompressedPreview";
 import FallbackPreview from "../preview/FallbackPreview";
