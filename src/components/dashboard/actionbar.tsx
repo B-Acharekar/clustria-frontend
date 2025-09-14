@@ -1,12 +1,13 @@
 "use client";
 
-import { Search, Upload, Plus, LogOut } from "lucide-react";
-import { useState } from "react";
+import { Search, Upload, Plus, LogOut, User } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { logout } from "@/services/auth";
+import { getProfile, logout } from "@/services/auth";
 import { uploadFile } from "@/services/file";
 import { createFolder } from "@/services/folder";
 import CreateModal from "./CreateFolderModal";
+import axios from "axios";
 
 interface ActionBarProps {
   currentFolderId?: string;
@@ -23,7 +24,20 @@ export default function ActionBar({
 }: ActionBarProps) {
   const [open, setOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [avatar, setAvatar] = useState<string | null>(null);
   const router = useRouter();
+  
+  useEffect(() => {
+      const fetchProfile = async () => {
+          try {
+              const data = await getProfile();
+              setAvatar(data.user.avatar || "");
+          } catch (err: any) {
+              console.log(err.response?.data?.msg || "Failed to fetch profile");
+          }
+      };
+      fetchProfile();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -87,11 +101,26 @@ export default function ActionBar({
               bg-black/40 border border-white/10 backdrop-blur-lg 
               text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
           >
-            N
+            {avatar ? (
+              <img
+                src={avatar}
+                alt="Avatar"
+                className="w-11 h-11 rounded-full object-cover"
+              />
+            ) : (
+              <User className="w-5 h-5 text-white" />
+            )}
           </button>
 
           {open && (
             <div className="absolute right-0 mt-3 w-44 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/10 shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+              <button
+                onClick={() => router.push("/profile")}
+                className="flex items-center gap-2 w-full px-4 py-3 text-sm text-gray-300 hover:bg-blue-500 hover:text-white transition-all duration-200"
+              >
+                <User className="w-4 h-4" />
+                Profile
+              </button>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 w-full px-4 py-3 text-sm text-gray-300 hover:bg-red-500 hover:text-white transition-all duration-200"

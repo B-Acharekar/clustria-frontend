@@ -27,3 +27,28 @@ export const logout = async () => {
   const res = await api.post("/logout");
   return res.data;
 };
+
+export const forgotPassword = async (email: string) => {
+  const res = await api.post("/forgot-password", { email });
+  return res.data;
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  const res = await api.post("/reset-password", { token, password });
+  return res.data;
+};
+
+export const getProfile = async () => {
+  const res = await api.get("/profile");
+  return res.data;
+};
+
+export const updateProfile = async (name?: string, avatar?: string) => {
+  const res = await api.put("/profile", { name, avatar });
+  return res.data;
+};
+
+export const changePassword = async (oldPassword: string, newPassword: string) => {
+  const res = await api.put("/change-password", { oldPassword, newPassword });
+  return res.data;
+};

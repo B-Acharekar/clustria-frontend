@@ -5,6 +5,7 @@ import {
   PanelRightOpen,
 } from "lucide-react";
 import clsx from "clsx";
+import Link from "next/link";
 
 export default function OuterSidebar({
   collapsed,
@@ -23,9 +24,9 @@ export default function OuterSidebar({
       )}
     >
       <div className="mb-10 w-full flex items-center justify-center">
-        <span className="text-sm font-bold tracking-wide text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 cursor-pointer">
+        <Link href={'/dashboard'} className="text-sm font-bold tracking-wide text-gray-300 hover:text-white hover:scale-105 transition-all duration-200 cursor-pointer">
           Clustria
-        </span>
+        </Link>
       </div>
 
       {/* Home */}

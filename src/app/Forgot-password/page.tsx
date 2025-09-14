@@ -5,23 +5,25 @@ import { RetroGrid } from "@/components/magicui/retro-grid";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { TypingAnimation } from "@/components/magicui/typing-animation";
 import Loader from "@/components/ui/Loader";
+import { forgotPassword, googleLogin } from "@/services/auth";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+    setError("");
 
     try {
-      //  Fake API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setMessage("Password reset link sent to your email.");
-    } catch (err) {
-      setMessage("Something went wrong. Please try again.");
+      const data = await forgotPassword(email); // call real backend
+      setMessage(data.msg);
+    } catch (err: any) {
+      setError(err.response?.data?.msg || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -29,11 +31,16 @@ export default function ForgotPasswordPage() {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
+    setMessage("");
+    setError("");
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("Google Sign-In for recovery clicked");
-    } catch (err) {
-      console.error(err);
+      // You can integrate Google OAuth here using `react-google-login` or NextAuth
+      const token = "GOOGLE_ID_TOKEN"; // get real token from Google Sign-In
+      const data = await googleLogin(token);
+      setMessage(`Logged in as ${data.user.name}`);
+    } catch (err: any) {
+      setError(err.response?.data?.msg || "Google Sign-In failed");
     } finally {
       setLoading(false);
     }
@@ -72,9 +79,8 @@ export default function ForgotPasswordPage() {
             />
           </div>
 
-          {message && (
-            <p className="text-sm text-center text-green-600">{message}</p>
-          )}
+          {message && <p className="text-sm text-center text-green-600">{message}</p>}
+          {error && <p className="text-sm text-center text-red-600">{error}</p>}
 
           <InteractiveHoverButton
             type="submit"
@@ -93,9 +99,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Try another way label */}
-        <p className="text-center text-gray-500 mb-3 font-medium">
-          Try another way
-        </p>
+        <p className="text-center text-gray-500 mb-3 font-medium">Try another way</p>
 
         {/* Google Sign-In */}
         <button
