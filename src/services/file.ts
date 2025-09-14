@@ -7,12 +7,12 @@ const api = axios.create({
 });
 
 // Upload file
-export const uploadFile = async (file: File, encryptionType = "NONE", folderId?: string) => {
+export const uploadFile = async (file: File, encryptionType = "NONE", folderId?: string,tags?: string) => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("encryptionType", encryptionType);
   if (folderId) formData.append("folderId", folderId);
-
+  if (tags) formData.append("tags", tags);
   const res = await api.post("/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
@@ -49,5 +49,11 @@ export const downloadFile = async (id: string) => {
 // Delete file
 export const deleteFile = async (id: string) => {
   const res = await api.delete(`/${id}`);
+  return res.data;
+};
+
+// Get storage info
+export const getStorageInfo = async () => {
+  const res = await api.get("/storage");
   return res.data;
 };

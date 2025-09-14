@@ -1,10 +1,40 @@
 "use client";
 
-export default function StorageMeter() {
-  const used = 13.8;
-  const total = 15;
-  const percent = (used / total) * 100;
+import { useState, useEffect } from "react";
+import { getStorageInfo } from "@/services/file";
 
+export default function StorageMeter() {
+  const [storage, setStorage] = useState({
+    storageUsed: 0,
+    storageLimit: 1,
+    usedPercentage: "0.00"
+  });
+
+  useEffect(() => {
+    async function fetchStorage() {
+      try {
+        const data = await getStorageInfo();
+        if (data.success) {
+          setStorage({
+            storageUsed: data.storageUsed,
+            storageLimit: data.storageLimit,
+            usedPercentage: data.usedPercentage
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch storage info", error);
+      }
+    }
+    fetchStorage();
+  }, []);
+
+  // Convert bytes to GB with two decimals
+  const formatGB = (bytes: number) => (bytes / (1024 * 1024 * 1024)).toFixed(2);
+
+  const used = parseFloat(formatGB(storage.storageUsed));
+  const total = parseFloat(formatGB(storage.storageLimit));
+  const percent = parseFloat(storage.usedPercentage);
+    
   return (
     <div className="p-4 rounded-xl bg-black/40 backdrop-blur-2xl border border-white/10 shadow-lg transition duration-500 hover:bg-black/50 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]">
       {/* Header */}
