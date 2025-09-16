@@ -4,8 +4,18 @@ import { X, Download, FileText, Trash2, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
-import MediaPreview from "../preview/MediaPreview";
 import PdfPreview from "../preview/PdfPreview";
+import ImagePreview from "../preview/ImagePreview";
+import VideoPreview from "../preview/VideoPreview";
+import AudioPreview from "../preview/AudioPreview";
+import DocumentPreview from "../preview/DocumentPreview";
+import ExcelPreview from "../preview/ExcelPreview";
+import PPTPreview from "../preview/PPTPreview";
+import CodePreview from "../preview/CodePreview";
+import CompressedPreview from "../preview/CompressedPreview";
+import FallbackPreview from "../preview/FallbackPreview";
+import { fileService } from "@/services/fileService";
+import { deleteFile } from "@/services/file";
 
 interface FilePreviewProps {
   file: any | null;
@@ -21,23 +31,36 @@ export default function FilePreview({ file, onClose }: FilePreviewProps) {
   const previewUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/files/${file._id}/download?preview=true`;
   const downloadUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/files/${file._id}/download`;
 
-  const handleDelete = async () => {
-    try {
-      setDeleting(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/files/${file._id}`,
-        { method: "DELETE" }
-      );
-      if (!res.ok) throw new Error("Failed to delete file");
-      setConfirmDelete(false);
-      onClose();
-      console.log("File deleted:", file._id);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete file");
-    } finally {
-      setDeleting(false);
-    }
+const handleDelete = async () => {
+  try {
+    setDeleting(true);
+    await deleteFile(file._id); // call the service
+    setConfirmDelete(false);
+    onClose();
+    console.log("File deleted:", file._id);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete file");
+  } finally {
+    setDeleting(false);
+  }
+};
+
+
+  const renderPreview = () => {
+    if (!ext) return <FallbackPreview file={file} previewUrl={previewUrl} />;
+
+    if (fileService.isPdf(ext)) return <PdfPreview file={file} previewUrl={previewUrl} />;
+    if (fileService.isImage(ext)) return <ImagePreview file={file} previewUrl={previewUrl} />;
+    if (fileService.isVideo(ext)) return <VideoPreview file={file} previewUrl={previewUrl} />;
+    if (fileService.isAudio(ext)) return <AudioPreview file={file} previewUrl={previewUrl} />;
+    if (fileService.isExcel(ext)) return <ExcelPreview file={file} previewUrl={previewUrl} />;
+    if (fileService.isPPT(ext)) return <PPTPreview file={file} previewUrl={previewUrl} />;
+    if (fileService.isDocument(ext)) return <DocumentPreview file={file} previewUrl={previewUrl} />;
+    if (fileService.isCode(ext)) return <CodePreview file={file} previewUrl={previewUrl} />;
+    if (fileService.isCompressed(ext)) return <CompressedPreview file={file} previewUrl={previewUrl} />;
+
+    return <FallbackPreview file={file} previewUrl={previewUrl} />;
   };
 
   return (
@@ -100,11 +123,7 @@ export default function FilePreview({ file, onClose }: FilePreviewProps) {
 
           {/* File Preview Area */}
           <div className="flex-1 flex items-center justify-center bg-white/10 backdrop-blur-xl p-0 overflow-hidden">
-            {ext === "pdf" ? (
-              <PdfPreview file={file} previewUrl={previewUrl} />
-            ) : (
-              <MediaPreview file={file} previewUrl={previewUrl} />
-            )}
+            {renderPreview()}
           </div>
         </motion.div>
       </motion.div>
