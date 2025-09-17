@@ -8,6 +8,7 @@ import { TypingAnimation } from "@/components/magicui/typing-animation";
 import Loader from "@/components/ui/Loader";
 import { signup, googleLogin } from '@/services/auth';
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import BackBtn from "@/components/ui/backbtn";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -75,6 +76,9 @@ export default function SignupPage() {
 
       {/* Signup Form */}
       <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        <div className="mb-4">
+            <BackBtn />
+        </div>
         <TypingAnimation className="text-4xl font-extrabold mb-6 text-center">
           SIGN UP
         </TypingAnimation>
