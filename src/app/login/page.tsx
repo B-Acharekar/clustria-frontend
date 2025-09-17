@@ -8,6 +8,7 @@ import { login, googleLogin } from "@/services/auth";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import Loader from "@/components/ui/Loader";
 import { useRouter } from "next/navigation";
+import BackBtn from "@/components/ui/backbtn";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -70,6 +71,9 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+          <div className="mb-4">
+            <BackBtn />
+          </div>
           <TypingAnimation className="text-4xl font-extrabold mb-6 text-center">
             LOGIN
           </TypingAnimation>

@@ -6,6 +6,7 @@ import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-b
 import { TypingAnimation } from "@/components/magicui/typing-animation";
 import Loader from "@/components/ui/Loader";
 import { forgotPassword, googleLogin } from "@/services/auth";
+import BackBtn from "@/components/ui/backbtn";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -63,6 +64,9 @@ export default function ForgotPasswordPage() {
 
       {/* Forgot Password Card */}
       <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        <div className="mb-4">
+            <BackBtn />
+        </div>
         <TypingAnimation className="text-3xl font-extrabold mb-6 text-center">
           Forgot Password
         </TypingAnimation>
