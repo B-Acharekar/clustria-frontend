@@ -12,16 +12,17 @@ import { motion } from "framer-motion";
 export default function DashboardPage() {
   const [collapsed, setCollapsed] = useState(false);
   const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([]);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [selectedFile, setSelectedFile] = useState<any | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // ✅ fallback to "" for root
   const currentFolderId =
-    folderPath.length > 0 ? folderPath[folderPath.length - 1].id : undefined;
+    folderPath.length > 0 ? folderPath[folderPath.length - 1].id : "";
+    console.log(currentFolderId)
 
   const handleOpenFolder = (id: string, name: string): void => {
     setFolderPath((prev) => [...prev, { id, name }]);
-    setSearchTerm(""); // Clear search when navigating to a new folder
+    setSearchTerm(""); // Clear search when navigating
   };
 
   const handleBacktrack = (index: number): void => {
@@ -63,13 +64,12 @@ export default function DashboardPage() {
       >
         <ActionBar
           currentFolderId={currentFolderId}
-          refresh={() => setRefreshKey((k) => k + 1)}
+          refresh={() => {}} // ❌ no longer needed
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
 
         <motion.div
-          key={refreshKey}
           className="rounded-2xl bg-black/40 shadow-lg backdrop-blur-xl border border-white/10 p-6 mt-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -106,8 +106,8 @@ export default function DashboardPage() {
             </>
           )}
 
+          {/* ✅ updated for new FileGrid */}
           <FileGrid
-            key={refreshKey}
             folderId={currentFolderId}
             searchTerm={searchTerm}
             onOpenFolder={handleOpenFolder}

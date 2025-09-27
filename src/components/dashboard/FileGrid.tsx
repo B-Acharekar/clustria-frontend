@@ -1,14 +1,30 @@
 "use client";
-
-import { getFolder } from "@/services/folder";
-import { FileIcon, FolderIcon, FileText, FileVideo, FileImage } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getFolder } from "@/services/folder";
+import FolderList from "./FolderList";
+import FileList from "./FileList";
+import Loader from "../ui/Loader";
+
+type SortKey = "name" | "size" | "date";
+type SortOrder = "asc" | "desc";
+
+interface File {
+  _id: string;
+  filename: string;
+  createdAt: string;
+  metadata?: { size?: number };
+}
+
+interface Folder {
+  _id: string;
+  name: string;
+}
 
 interface FileGridProps {
-  folderId?: string;
+  folderId: string;
   onOpenFolder?: (id: string, name: string) => void;
-  onFileClick?: (file: any) => void;
-  searchTerm?: string; // Optional search term for filtering
+  onFileClick?: (file: File) => void;
+  searchTerm?: string;
 }
 
 export default function FileGrid({
@@ -17,94 +33,89 @@ export default function FileGrid({
   onFileClick,
   searchTerm = "",
 }: FileGridProps) {
-  const [folders, setFolders] = useState<any[]>([]);
-  const [files, setFiles] = useState<any[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");  
+  const [loading, setLoading] = useState<boolean>(true); 
+
 
   useEffect(() => {
+    setLoading(true);
     (async () => {
       try {
         const data = await getFolder(folderId);
         setFolders(data.folders || []);
         setFiles(data.files || []);
-      } catch (error) {
-        console.error("Failed to fetch folder data:", error);
+      } catch (err) {
         setFolders([]);
         setFiles([]);
+      }finally {
+        setLoading(false); // hide loader after fetch
       }
     })();
   }, [folderId]);
 
-  // Normalize search term to lowercase for case-insensitive filtering
-  const normalizedSearchTerm = searchTerm.toLowerCase();
-
-  // Filter folders and files based on search term
-  const filteredFolders = folders.filter((folder) =>
-    folder.name.toLowerCase().includes(normalizedSearchTerm)
+  const normalizedSearch = searchTerm.toLowerCase();
+  const filteredFolders = folders.filter((f) =>
+    f.name.toLowerCase().includes(normalizedSearch)
+  );
+  const filteredFiles = files.filter((f) =>
+    f.filename.toLowerCase().includes(normalizedSearch)
   );
 
-  const filteredFiles = files.filter((file) =>
-    file.filename.toLowerCase().includes(normalizedSearchTerm)
-  );
-
-  // Function to return the correct icon based on file extension
-  const getFileIcon = (filename: string) => {
-    const ext = filename.split(".").pop()?.toLowerCase();
-
-    if (!ext) return <FileIcon className="w-10 h-10 text-blue-400" />;
-
-    if (ext === "pdf") {
-      return <FileText className="w-10 h-10 text-red-600" />;
+  const sortedFiles = [...filteredFiles].sort((a, b) => {
+    let valA: any, valB: any;
+    switch (sortKey) {
+      case "size":
+        valA = a.metadata?.size || 0;
+        valB = b.metadata?.size || 0;
+        break;
+      case "date":
+        valA = new Date(a.createdAt).getTime();
+        valB = new Date(b.createdAt).getTime();
+        break;
+      default:
+        valA = a.filename.toLowerCase();
+        valB = b.filename.toLowerCase();
     }
+    if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+    if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
 
-    if (["doc", "docx", "txt"].includes(ext)) {
-      return <FileText className="w-10 h-10 text-green-600" />;
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortOrder("asc");
     }
-
-    if (["png", "jpg", "jpeg", "gif"].includes(ext)) {
-      return <FileImage className="w-10 h-10 text-pink-500" />;
-    }
-
-    if (["mp4", "webm", "mov"].includes(ext)) {
-      return <FileVideo className="w-10 h-10 text-purple-600" />;
-    }
-
-    return <FileIcon className="w-10 h-10 text-blue-400" />;
   };
 
-  return (
-    <div className="p-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-      {/* Render filtered folders */}
-      {filteredFolders.map((folder) => (
-        <div
-          key={folder._id}
-          onClick={() => onOpenFolder?.(folder._id, folder.name)}
-          className="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
-        >
-          <div className="flex flex-col items-center">
-            <FolderIcon className="w-10 h-10 text-yellow-400" />
-            <p className="mt-3 text-sm font-medium text-white truncate w-full text-center">
-              {folder.name}
-            </p>
-          </div>
-        </div>
-      ))}
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader />
+      </div>
+    );
+  }
 
-      {/* Render filtered files */}
-      {filteredFiles.map((file) => (
-        <div
-          key={file._id}
-          onClick={() => onFileClick?.(file)}
-          className="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
-        >
-          <div className="flex flex-col items-center">
-            {getFileIcon(file.filename)}
-            <p className="mt-3 text-sm font-medium text-white truncate w-full text-center">
-              {file.filename}
-            </p>
-            {file.size && <p className="text-xs text-gray-400">{file.size}</p>}
-          </div>
-        </div>
-      ))}
+  return (
+    <div className="space-y-6">
+      <FolderList folders={filteredFolders} onOpenFolder={onOpenFolder} />
+      <FileList
+        files={sortedFiles}
+        onFileClick={onFileClick}
+        sortKey={sortKey}
+        sortOrder={sortOrder}
+        toggleSort={toggleSort}
+      />
+      {filteredFolders.length === 0 && sortedFiles.length === 0 && (
+        <p className="text-gray-500 text-sm text-center py-10">
+          No items in this folder
+        </p>
+      )}
     </div>
   );
 }

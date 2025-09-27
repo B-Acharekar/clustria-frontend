@@ -17,6 +17,17 @@ export const getFolder = async (id?: string) => {
   return res.data; // { folders, files }
 };
 
+export const getAllFoldersForSidebar = async (id?: string) => {
+  const url = "/";
+  const res = await api.get(url);
+  return res.data; // { folders, files }
+};
+
+export const getFolderPath = async (id: string) => {
+  const res = await api.get(`/path/${id}`);
+  return res.data; // [{id, name}, ..., current folder]
+};
+
 export const renameFolder = async (id: string, name: string) => {
   const res = await api.put(`/${id}`, { name });
   return res.data;

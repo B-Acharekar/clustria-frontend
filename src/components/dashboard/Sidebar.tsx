@@ -3,6 +3,7 @@ import {
   Folder,
   PanelRightClose,
   PanelRightOpen,
+  Settings,
 } from "lucide-react";
 import clsx from "clsx";
 import Link from "next/link";
@@ -10,11 +11,11 @@ import Link from "next/link";
 export default function OuterSidebar({
   collapsed,
   setCollapsed,
-  onHomeClick,
+  currentFolderId = "", 
 }: {
   collapsed: boolean;
   setCollapsed: (v: boolean) => void;
-  onHomeClick?: () => void;
+  currentFolderId?: string; 
 }) {
   return (
     <div
@@ -30,25 +31,35 @@ export default function OuterSidebar({
       </div>
 
       {/* Home */}
-      <button
-        onClick={onHomeClick}
+      <Link
+        href={"/dashboard"}
         className="group flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition-all w-full"
       >
         <Home className="w-5 h-5 text-gray-300 group-hover:text-blue-400 transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-200" />
         <span className="text-[10px] text-gray-400 group-hover:text-blue-400 transition-colors duration-200">
           Home
         </span>
-      </button>
+      </Link>
 
-      {/* Folders (can later open another sidebar if you want) */}
-      <button
+      <Link 
+        href={`/folder/${currentFolderId || ""}`}
         className="group flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition-all w-full"
       >
         <Folder className="w-5 h-5 text-gray-300 group-hover:text-yellow-400 transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-200" />
         <span className="text-[10px] text-gray-400 group-hover:text-yellow-400 transition-colors duration-200">
           Folders
         </span>
-      </button>
+      </Link>
+
+      <Link
+        href="/settings"
+        className="group flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition-all w-full"
+        >
+          <Settings className="w-5 h-5 text-gray-300 group-hover:text-yellow-400 transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-200" />
+          <span className="text-[10px] text-gray-400 group-hover:text-yellow-400 transition-colors duration-200">
+            Settings
+          </span>
+      </Link>
 
       <div className="flex-1" />
 

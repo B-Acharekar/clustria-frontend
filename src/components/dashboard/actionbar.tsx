@@ -8,6 +8,7 @@ import { uploadFile } from "@/services/file";
 import { createFolder } from "@/services/folder";
 import CreateModal from "./CreateFolderModal";
 import axios from "axios";
+import UploadModal from "./UploadModal";
 
 interface ActionBarProps {
   currentFolderId?: string;
@@ -24,6 +25,7 @@ export default function ActionBar({
 }: ActionBarProps) {
   const [open, setOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
   const router = useRouter();
   
@@ -75,22 +77,25 @@ export default function ActionBar({
         <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-3">
-        <label className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white text-black hover:bg-zinc-200 shadow-sm hover:shadow-md cursor-pointer">
-          <Upload size={18} />
-          Upload
-          <input type="file" hidden onChange={handleUpload} />
-        </label>
 
-        <button
-          onClick={() => setCreateModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 text-zinc-300 border border-zinc-700 hover:bg-zinc-800 hover:text-white shadow-sm hover:shadow-md"
-        >
-          <Plus size={18} />
-          Create
-        </button>
-      </div>
+    {/* Action Buttons */}
+    <div className="flex flex-wrap gap-3">
+      <button
+        onClick={() => setUploadModalOpen(true)}
+        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white text-black hover:bg-zinc-200 shadow-sm hover:shadow-md"
+      >
+        <Upload size={18} />
+        Upload
+      </button>
+
+      <button
+        onClick={() => setCreateModalOpen(true)}
+        className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 text-zinc-300 border border-zinc-700 hover:bg-zinc-800 hover:text-white shadow-sm hover:shadow-md"
+      >
+        <Plus size={18} />
+        Create
+      </button>
+    </div>
 
       {/* Profile Button */}
       <div className="absolute right-0 top-0">
@@ -133,6 +138,13 @@ export default function ActionBar({
         </div>
       </div>
 
+    <UploadModal
+      open={uploadModalOpen}
+      onClose={() => setUploadModalOpen(false)}
+      currentFolderId={currentFolderId}
+      refresh={refresh}
+    />
+    
       {/* Create Modal */}
       <CreateModal
         open={createModalOpen}
