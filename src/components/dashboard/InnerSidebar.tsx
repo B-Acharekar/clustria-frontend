@@ -121,7 +121,10 @@ export default function InnerSidebar({ collapsed, onClose }: InnerSidebarProps) 
       {/* Storage + Upgrade Plan */}
       <div className="px-4 py-4 border-t border-white/10">
         <StorageMeter />
-        <button className="mt-2 w-full text-sm bg-pink-600 hover:bg-pink-700 text-white rounded-lg py-2 transition">
+        <button
+          onClick={() => router.push("/plan")}
+          className="mt-2 w-full text-sm bg-pink-600 hover:bg-pink-700 text-white rounded-lg py-2 transition"
+        >
           Upgrade Plan
         </button>
       </div>
