@@ -11,7 +11,9 @@ interface DocumentPreviewProps {
 export default function DocumentPreview({ file, previewUrl }: DocumentPreviewProps) {
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const ext = file.filename.split(".").pop()?.toLowerCase();
+  const ext = file?.filename?.includes(".")
+    ? file.filename.split(".").pop()?.toLowerCase()
+    : "";
 
   useEffect(() => {
     const fetchContent = async () => {

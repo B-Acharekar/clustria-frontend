@@ -106,12 +106,12 @@ export default function InnerSidebar({ collapsed, onClose }: InnerSidebarProps) 
 
         {/* Quick Links */}
         <div className="mt-3 space-y-1">
-          <button className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
+          <Link href={'/Recent'} className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
             <Clock className="w-4 h-4 text-gray-400 mr-2" /> Recent
-          </button>
-          <button className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
+          </Link>
+          <Link href={'/Starred'} className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
             <Star className="w-4 h-4 text-yellow-400 mr-2" /> Starred
-          </button>
+          </Link>
           <Link  href={'/trash/'} className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
             <Trash2 className="w-4 h-4 text-red-400 mr-2" /> Trash
           </Link>
