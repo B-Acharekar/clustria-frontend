@@ -50,10 +50,7 @@ export const listFiles = async (folderId?: string) => {
 
 // Download file
 export const downloadFile = async (id: string) => {
-  const res = await api.get(`/${id}/download`, {
-    responseType: "blob",
-  });
-
+  const res = await api.get(`/${id}/download`, { responseType: "blob" });
   const url = window.URL.createObjectURL(new Blob([res.data]));
   const link = document.createElement("a");
   link.href = url;
@@ -76,5 +73,39 @@ export const deleteFile = async (id: string) => {
 // Storage info
 export const getStorageInfo = async () => {
   const res = await api.get("/storage");
+  return res.data;
+};
+
+export const shareFile = async (id: string, email: string) => {
+  const res = await api.post(`/${id}/share`, { email });
+  return res.data;
+};
+
+export const renameFile = async (id: string, newName: string) => {
+  const res = await api.patch(`/${id}/rename`, { newName });
+  return res.data;
+};
+
+// Get file details / preview
+export const getFileById = async (id: string, preview = true) => {
+  const res = await api.get(`/${id}`, { params: { preview } });
+  return res.data;
+};
+
+// Toggle star/unstar a file
+export const toggleStarFile = async (id: string) => {
+  const res = await api.patch(`/${id}/star`);
+  return res.data;
+};
+
+// Get all starred files
+export const getStarredFiles = async () => {
+  const res = await api.get("/starred");
+  return res.data;
+};
+
+// Get recent files
+export const getRecentFiles = async () => {
+  const res = await api.get("/recent");
   return res.data;
 };

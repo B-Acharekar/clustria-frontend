@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { CreditCard, User, Mail, MoveLeft, Landmark } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Plan } from './PlanSelection'
+import RazorpayButton from './RazerpayButton'
 
 interface Props {
   plan: Plan
@@ -20,7 +21,7 @@ export default function CheckoutForm({ plan, onBack, onSuccess }: Props) {
     cvc: '',
   })
   const [loading, setLoading] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'upi' | 'netbanking'>('card')
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'upi' | 'netbanking' | 'razorpay'>('card')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -52,7 +53,7 @@ export default function CheckoutForm({ plan, onBack, onSuccess }: Props) {
         className="bg-gray-900/90 p-6 rounded-3xl w-full max-w-md border border-white/10 shadow-2xl text-white"
       >
         <button onClick={onBack} className="mb-4 text-indigo-400 underline">
-          <MoveLeft/>
+          <MoveLeft />
         </button>
 
         <h2 className="text-3xl font-bold mb-1">{plan.title} Plan</h2>
@@ -60,22 +61,28 @@ export default function CheckoutForm({ plan, onBack, onSuccess }: Props) {
 
         {/* Payment tabs */}
         <div className="flex gap-2 mb-6">
-          {['card', 'upi', 'netbanking'].map((method) => (
+          {['card', 'upi', 'netbanking', 'razorpay'].map((method) => (
             <button
               key={method}
               onClick={() => setPaymentMethod(method as any)}
-              className={`flex-1 px-4 py-2 rounded-t-xl border-b-2 text-center font-medium transition ${
-                paymentMethod === method
-                  ? 'border-indigo-500 text-white'
-                  : 'border-transparent text-gray-400 hover:text-white'
-              }`}
+              className={`flex-1 px-4 py-2 rounded-t-xl border-b-2 text-center font-medium transition ${paymentMethod === method
+                ? 'border-indigo-500 text-white'
+                : 'border-transparent text-gray-400 hover:text-white'
+                }`}
             >
               {method === 'card' && <CreditCard className="inline w-4 h-4 mr-1" />}
               {method === 'upi' && (
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/UPI_logo.svg" className="inline w-4 h-4 mr-1" />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/6/6f/UPI_logo.svg"
+                  className="inline mr-1"
+                />
               )}
-              {method === 'netbanking' && (
-                <Landmark className="inline w-4 h-4 mr-1"/>
+              {method === 'netbanking' && <Landmark className="inline w-4 h-4 mr-1" />}
+              {method === 'razorpay' && (
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg"
+                  className="inline mr-1"
+                />
               )}
               {method.charAt(0).toUpperCase() + method.slice(1)}
             </button>
@@ -167,20 +174,39 @@ export default function CheckoutForm({ plan, onBack, onSuccess }: Props) {
         {paymentMethod === 'upi' && (
           <div className="flex flex-col gap-4 items-center">
             <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-green-600 hover:bg-green-700 w-full">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/UPI_Logo.png" className="w-6 h-6" />
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/2/2a/UPI_Logo.png"
+                className="w-6 h-6"
+              />
               Pay with UPI
             </button>
-            <p className="text-gray-400 text-sm text-center mt-1">You will be redirected to your UPI app</p>
+            <p className="text-gray-400 text-sm text-center mt-1">
+              You will be redirected to your UPI app
+            </p>
           </div>
         )}
 
         {paymentMethod === 'netbanking' && (
           <div className="flex flex-col gap-4 items-center">
             <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 w-full">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Bank_icon.png" className="w-6 h-6" />
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Bank_icon.png"
+                className="w-6 h-6"
+              />
               Pay with NetBanking
             </button>
-            <p className="text-gray-400 text-sm text-center mt-1">Securely pay using your bank account</p>
+            <p className="text-gray-400 text-sm text-center mt-1">
+              Securely pay using your bank account
+            </p>
+          </div>
+        )}
+
+        {paymentMethod === 'razorpay' && (
+          <div className="flex flex-col gap-2 items-center">
+            <RazorpayButton />
+            <p className="text-gray-400 text-sm text-center mt-2">
+              Donate us for our free service ❤️
+            </p>
           </div>
         )}
       </motion.div>
