@@ -112,7 +112,7 @@ export default function InnerSidebar({ collapsed, onClose }: InnerSidebarProps) 
           <button className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
             <Star className="w-4 h-4 text-yellow-400 mr-2" /> Starred
           </button>
-          <Link  href={'/trash'} className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
+          <Link  href={'/trash/'} className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
             <Trash2 className="w-4 h-4 text-red-400 mr-2" /> Trash
           </Link>
         </div>
@@ -121,7 +121,10 @@ export default function InnerSidebar({ collapsed, onClose }: InnerSidebarProps) 
       {/* Storage + Upgrade Plan */}
       <div className="px-4 py-4 border-t border-white/10">
         <StorageMeter />
-        <button className="mt-2 w-full text-sm bg-pink-600 hover:bg-pink-700 text-white rounded-lg py-2 transition">
+        <button
+          onClick={() => router.push("/plan")}
+          className="mt-2 w-full text-sm bg-pink-600 hover:bg-pink-700 text-white rounded-lg py-2 transition"
+        >
           Upgrade Plan
         </button>
       </div>
