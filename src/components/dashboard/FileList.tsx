@@ -308,7 +308,7 @@ export default function FileList({
           <div className="bg-gray-900 p-6 rounded-lg w-80">
             <h3 className="text-white font-semibold mb-4">Delete File</h3>
             <p className="text-gray-300 mb-4">
-              Are you sure you want to delete "{deleteModal.file?.filename}"?
+              Are you sure you want to delete &quot;{deleteModal.file?.filename}&quot;?
             </p>
             <div className="flex justify-end gap-2">
               <button

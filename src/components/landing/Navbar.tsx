@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Home, Layout, Mail, Users, Package, LogIn, UserPlus } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Navbar() {
   const [isLanding, setIsLanding] = useState(true)
@@ -33,22 +34,22 @@ export default function Navbar() {
       className="fixed top-0 left-0 w-full z-50 bg-black/50 backdrop-blur-md border-b border-white/10"
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <a
+        <Link
           href="/"
           className="text-white text-xl font-semibold tracking-tight hover:opacity-80 transition-opacity"
         >
           Clustria
-        </a>
+        </Link>
 
         <div className="hidden md:flex items-center space-x-6 text-sm text-gray-300">
           <a href="#features" className="hover:text-white transition">Features</a>
           <a href="#pricing" className="hover:text-white transition">Pricing</a>
-          <a
+          <Link
             href="/login"
             className="px-4 py-1.5 border border-white/20 rounded-lg hover:border-white hover:text-white transition"
           >
             Login
-          </a>
+          </Link>
         </div>
       </div>
 

@@ -12,10 +12,12 @@ export default function OuterSidebar({
   collapsed,
   setCollapsed,
   currentFolderId = "", 
+  onHomeClick,
 }: {
   collapsed: boolean;
   setCollapsed: (v: boolean) => void;
   currentFolderId?: string; 
+  onHomeClick?: () => void;
 }) {
   return (
     <div

@@ -21,7 +21,7 @@ export default function FeedbackControl() {
         </div>
 
         <div className="bg-gray-900/40 p-6 rounded-xl border border-white/10 hover:shadow-xl transition-all">
-          <h3 className="text-xl font-semibold text-white mb-3">You're in Control</h3>
+<h3 className="text-xl font-semibold text-white mb-3">You&apos;re in Control</h3>
           <p className="text-gray-400 leading-relaxed">
             Every change is fully previewed. Accept, reject, or customize — nothing happens without your approval.
           </p>

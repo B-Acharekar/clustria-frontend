@@ -10,11 +10,11 @@ export default function SmartSearch() {
             Search by Meaning
           </h3>
           <p className="text-gray-300 mb-4 text-lg">
-            Don't remember the file name? No problem.
-            Use natural language like{" "}
-            <span className="italic text-white">"project report from June"</span> 
-            or{" "}
-            <span className="italic text-white">"slides shared by Riya"</span> to instantly find the document you're looking for.
+            Don&apos;t remember the file name? No problem.
+            Use natural language like{' '}
+            <span className="italic text-white">&quot;project report from June&quot;</span> 
+            or{' '}
+            <span className="italic text-white">&quot;slides shared by Riya&quot;</span> to instantly find the document you&apos;re looking for.
           </p>
           <p className="text-gray-500 text-sm">
             Powered by deep semantic vector search that understands context — not just keywords.
@@ -30,7 +30,7 @@ export default function SmartSearch() {
             Create smart rules to automatically file incoming documents by type, tags, content, sender, or even tone.
           </p>
           <p className="text-gray-500 text-sm">
-            It’s like having an AI assistant that keeps your folders tidy while you focus on the big stuff.
+            It&apos;s like having an AI assistant that keeps your folders tidy while you focus on the big stuff.
           </p>
         </div>
       </div>

@@ -51,9 +51,9 @@ export default function ProfilePage() {
         setMsg("");
         setError("");
         try {
-            let uploadedAvatar = avatar;
-            // Optional: upload to server/cloudinary here
-            const data = await updateProfile(name, uploadedAvatar);
+        const uploadedAvatar = avatar;
+        // Optional: upload to server/cloudinary here
+        const data = await updateProfile(name, uploadedAvatar);
             setUser(data.user);
             setEditing(false);
             setMsg("Profile updated successfully");
