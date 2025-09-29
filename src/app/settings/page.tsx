@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { motion } from "framer-motion";
 import SettingsInnerSidebar from "@/components/settings/SettingsInnerSidebar";
@@ -19,7 +20,7 @@ export default function SettingsPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<"pro" | "business">("pro");
   
-  
+  const router = useRouter();
   const profileRef = useRef<HTMLDivElement | null>(null);
   const securityRef = useRef<HTMLDivElement | null>(null);
   const planRef = useRef<HTMLDivElement | null>(null);
@@ -115,6 +116,7 @@ export default function SettingsPage() {
               onUpgrade={() => {
                 setSelectedPlan("pro"); // or "business" if you have multiple options
                 setShowPaymentModal(true);
+                router.push(`/plan?selected=${currentPlan.name.toLowerCase()}`);
               }}
             />
           </section>
