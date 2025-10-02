@@ -48,17 +48,19 @@ export const listFiles = async (folderId?: string) => {
   return res.data;
 };
 
-// Download file
-export const downloadFile = async (id: string) => {
+// Get a download URL for a file (blob)
+export const getDownloadUrl = async (id: string) => {
   const res = await api.get(`/${id}/download`, { responseType: "blob" });
   const url = window.URL.createObjectURL(new Blob([res.data]));
+  return url;
+};
+
+// Original downloadFile function (optional)
+export const downloadFile = async (id: string) => {
+  const url = await getDownloadUrl(id);
   const link = document.createElement("a");
   link.href = url;
-
-  const disposition = res.headers["content-disposition"];
-  const match = disposition?.match(/filename="?(.+)"?/);
-  link.download = match ? match[1] : "download";
-
+  link.download = "download";
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -108,4 +110,21 @@ export const getStarredFiles = async () => {
 export const getRecentFiles = async () => {
   const res = await api.get("/recent");
   return res.data;
+};
+
+export const previewFile = async (id: string) => {
+  try {
+    const res = await api.get(`/${id}/download`, {
+      params: { preview: true },
+      responseType: "blob",
+    });
+
+    // Use the correct MIME type
+    const mimeType = res.headers["content-type"] || "application/octet-stream";
+    const url = window.URL.createObjectURL(new Blob([res.data], { type: mimeType }));
+    return url;
+  } catch (err) {
+    console.error("Failed to preview file", err);
+    throw err;
+  }
 };
