@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion'
 import { RetroGrid } from '@/components/magicui/retro-grid'
+import Link from 'next/link'
+import { ArrowRight, Github } from 'lucide-react'
 
 export default function Hero() {
   return (
@@ -20,6 +22,14 @@ export default function Hero() {
 
       {/* Main content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.05, duration: 0.6 }}
+          className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-400/10 px-4 py-2 text-xs font-medium text-indigo-200"
+        >
+          <Github className="h-3.5 w-3.5" /> Open-source friendly file workspace
+        </motion.div>
         <motion.h1
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -46,14 +56,17 @@ export default function Hero() {
           whileTap={{ scale: 0.96 }}
           className="inline-block mt-10"
         >
-          <a
+          <Link
             href="/signup"
             role="button"
-            className="px-6 py-3 text-black font-medium rounded-xl bg-white/90 backdrop-blur-md shadow-md hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 text-black font-medium rounded-xl bg-white/90 backdrop-blur-md shadow-md hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
           >
-            Start for Free
-          </a>
+            Start for Free <ArrowRight className="h-4 w-4" />
+          </Link>
         </motion.div>
+        <Link href="/login" className="mt-5 inline-block text-sm text-gray-400 transition hover:text-white">
+          Already have an account? Open your workspace →
+        </Link>
       </div>
     </section>
   )

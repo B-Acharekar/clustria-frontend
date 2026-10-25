@@ -1,11 +1,27 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Camera, HardDrive, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import Loader from "@/components/ui/Loader";
-import { TypingAnimation } from "@/components/magicui/typing-animation";
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { getProfile, updateProfile, changePassword as changePasswordAPI } from "@/services/auth";
+import { getStorageInfo } from "@/services/file";
 import OuterSidebar from "@/components/dashboard/Sidebar";
+
+const fileToDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+const formatBytes = (bytes: number) => {
+    if (!bytes) return "0 B";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    return `${(bytes / 1024 ** index).toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+};
 
 export default function ProfilePage() {
     const [user, setUser] = useState<any>(null);
@@ -18,18 +34,27 @@ export default function ProfilePage() {
     const [name, setName] = useState("");
     const [avatar, setAvatar] = useState("");
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [storage, setStorage] = useState<any>(null);
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [outerCollapsed, setOuterCollapsed] = useState(false);
-    const [innerVisible, setInnerVisible] = useState(false);
+    const router = useRouter();
     useEffect(() => {
         const fetchProfile = async () => {
             setLoading(true);
             try {
-                const data = await getProfile();
+                const [profileResult, storageResult] = await Promise.allSettled([
+                    getProfile(),
+                    getStorageInfo(),
+                ]);
+                if (profileResult.status === "rejected") throw profileResult.reason;
+                const data = profileResult.value;
                 setUser(data.user);
                 setName(data.user.name);
                 setAvatar(data.user.avatar || "");
+                if (storageResult.status === "fulfilled" && storageResult.value.success) {
+                    setStorage(storageResult.value);
+                }
             } catch (err: any) {
                 setError(err.response?.data?.msg || "Failed to fetch profile");
             } finally {
@@ -41,8 +66,19 @@ export default function ProfilePage() {
 
     const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setAvatarFile(e.target.files[0]);
-            setAvatar(URL.createObjectURL(e.target.files[0]));
+            const file = e.target.files[0];
+            if (!file.type.startsWith("image/")) {
+                setError("Please choose an image file.");
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                setError("Avatar images must be smaller than 2 MB.");
+                return;
+            }
+            setError("");
+            setAvatarFile(file);
+            setAvatar(URL.createObjectURL(file));
+            setEditing(true);
         }
     };
 
@@ -51,10 +87,11 @@ export default function ProfilePage() {
         setMsg("");
         setError("");
         try {
-        const uploadedAvatar = avatar;
-        // Optional: upload to server/cloudinary here
+        const uploadedAvatar = avatarFile ? await fileToDataUrl(avatarFile) : avatar;
         const data = await updateProfile(name, uploadedAvatar);
             setUser(data.user);
+            setAvatar(data.user.avatar || "");
+            setAvatarFile(null);
             setEditing(false);
             setMsg("Profile updated successfully");
         } catch (err: any) {
@@ -65,6 +102,10 @@ export default function ProfilePage() {
     };
 
     const handleChangePassword = async () => {
+        if (newPassword.length < 8) {
+            setError("New password must be at least 8 characters.");
+            return;
+        }
         setLoading(true);
         setMsg("");
         setError("");
@@ -82,7 +123,7 @@ export default function ProfilePage() {
 
     if (loading && !user) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="flex items-center justify-center min-h-screen bg-[#101011]">
                 <Loader />
             </div>
         );
@@ -90,107 +131,149 @@ export default function ProfilePage() {
 
     return (
         <div className="flex min-h-screen bg-gradient-to-br from-[#0f0f0f] via-[#1a1a1a] to-[#0f0f0f] text-white">
-            {/* Sidebar placeholder */}
             <OuterSidebar
                 collapsed={outerCollapsed}
                 setCollapsed={setOuterCollapsed}
-                onHomeClick={() => setInnerVisible(true)}
             />
 
-            <div className="flex-1 p-8">
-                <div className="max-w-3xl mx-auto bg-black rounded-2xl shadow p-8 space-y-6">
+            <div className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-8">
+                <div className="mx-auto max-w-5xl space-y-6">
                     <div className="flex items-center justify-between">
-                        <TypingAnimation className="text-3xl font-extrabold">
-                            Profile
-                        </TypingAnimation>
-                        <InteractiveHoverButton
+                        <div>
+                            <button
+                                type="button"
+                                onClick={() => router.push("/dashboard")}
+                                className="mb-3 flex items-center gap-2 text-sm text-gray-400 transition hover:text-white"
+                            >
+                                <ArrowLeft className="h-4 w-4" /> Back to workspace
+                            </button>
+                            <p className="text-xs font-medium uppercase tracking-[0.2em] text-blue-300/80">Account settings</p>
+                            <h1 className="mt-1 text-3xl font-semibold">Your profile</h1>
+                            <p className="mt-1 text-sm text-gray-400">Manage your identity, security, and workspace usage.</p>
+                        </div>
+                        <span className="hidden items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs text-emerald-300 sm:flex">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Account active
+                        </span>
+                        <button
                             type="button"
-                            onClick={() => setEditing(!editing)}
-                            className="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-900"
+                            onClick={() => {
+                                if (editing) {
+                                    setEditing(false);
+                                    setName(user?.name || "");
+                                    setAvatar(user?.avatar || "");
+                                    setAvatarFile(null);
+                                } else {
+                                    setEditing(true);
+                                }
+                            }}
+                            className="self-start rounded-xl border border-white/10 bg-white/[0.06] px-4 py-2 text-sm text-gray-200 transition hover:bg-white/10"
                         >
                             {editing ? "Cancel" : "Edit Profile"}
-                        </InteractiveHoverButton>
+                        </button>
                     </div>
 
-                    {msg && <p className="text-green-600">{msg}</p>}
-                    {error && <p className="text-red-600">{error}</p>}
+                    {(msg || error) && <p className={`rounded-xl border px-4 py-3 text-sm ${error ? "border-red-400/20 bg-red-400/10 text-red-200" : "border-emerald-400/20 bg-emerald-400/10 text-emerald-200"}`}>{error || msg}</p>}
 
-                    <div className="flex flex-col md:flex-row md:items-center md:space-x-8 space-y-4 md:space-y-0">
-                        <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-300">
+                    <div className="rounded-2xl border border-white/10 bg-black/35 p-6 shadow-xl backdrop-blur-xl sm:p-8">
+                    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                        <div className="flex items-center gap-5">
+                        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl border border-white/15 bg-white/10">
                             {avatar ? (
-                                <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                <img src={avatar} alt="Avatar" className="h-full w-full object-cover" />
                             ) : (
-                                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                    No Avatar
+                                <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-blue-200">
+                                    {(user?.name || "C").slice(0, 1).toUpperCase()}
                                 </div>
                             )}
+                            <label className="absolute inset-x-0 bottom-0 flex cursor-pointer items-center justify-center gap-1 bg-black/70 py-1.5 text-[11px] text-white">
+                                <Camera className="h-3.5 w-3.5" /> Change
+                                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                            </label>
                         </div>
+                        <div>
+                            <p className="text-xl font-semibold">{user?.name || "Clustria user"}</p>
+                            <p className="mt-1 flex items-center gap-2 text-sm text-gray-400"><Mail className="h-4 w-4" /> {user?.email}</p>
+                            <p className="mt-3 text-xs text-gray-500">Images are stored with your profile. Max 2 MB.</p>
+                        </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-400"><ShieldCheck className="h-4 w-4 text-blue-300" /> Private workspace</div>
+                    </div>
+                    </div>
 
-                        {editing && (
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleAvatarChange}
-                                className="text-sm text-gray-500 mt-2"
-                            />
-                        )}
-
-                        <div className="flex-1 space-y-3">
+                    <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+                    <div className="rounded-2xl border border-white/10 bg-black/35 p-6 shadow-xl backdrop-blur-xl">
+                        <h2 className="mb-6 text-lg font-semibold">Profile details</h2>
+                        <div className="space-y-4">
                             <div>
-                                <p className="text-gray-500 text-sm">Name</p>
+                                <p className="mb-2 text-sm text-gray-400">Display name</p>
                                 {editing ? (
                                     <input
                                         type="text"
-                                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                                        className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-white outline-none focus:border-blue-400/60 focus:ring-2 focus:ring-blue-500/20"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                     />
                                 ) : (
-                                    <p className="text-lg font-semibold">{user?.name}</p>
+                                    <p className="text-lg font-semibold text-white">{user?.name}</p>
                                 )}
                             </div>
 
                             <div>
-                                <p className="text-gray-500 text-sm">Email</p>
-                                <p className="text-lg font-semibold">{user?.email}</p>
+                                <p className="mb-2 text-sm text-gray-400">Email address</p>
+                                <p className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-gray-300">{user?.email}</p>
+                                <p className="mt-2 text-xs text-gray-500">Email changes are managed through your account provider.</p>
                             </div>
 
                             {editing && (
-                                <InteractiveHoverButton
+                                <button
                                     type="button"
                                     onClick={handleUpdateProfile}
-                                    className="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-900 mt-2"
+                                    disabled={loading}
+                                    className="rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-gray-200 disabled:opacity-50"
                                 >
-                                    Save Changes
-                                </InteractiveHoverButton>
+                                    {loading ? "Saving..." : "Save changes"}
+                                </button>
                             )}
                         </div>
                     </div>
 
-                    <div className="mt-6 border-t border-gray-200 pt-6 space-y-4">
-                        <TypingAnimation className="text-2xl font-bold">Change Password</TypingAnimation>
-                        <div className="space-y-3 max-w-md">
+                    <div className="rounded-2xl border border-white/10 bg-black/35 p-6 shadow-xl backdrop-blur-xl">
+                        <h2 className="flex items-center gap-2 text-lg font-semibold"><HardDrive className="h-5 w-5 text-yellow-300" /> Workspace usage</h2>
+                        <p className="mt-1 text-sm text-gray-400">Your current storage footprint.</p>
+                        <p className="mt-8 text-3xl font-semibold">{storage ? formatBytes(storage.storageUsed) : "—"}</p>
+                        <p className="mt-1 text-sm text-gray-500">of {storage ? formatBytes(storage.storageLimit) : "—"} used</p>
+                        <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-blue-400 to-indigo-500" style={{ width: `${Math.min(Number(storage?.usedPercentage || 0), 100)}%` }} /></div>
+                        <button onClick={() => router.push("/plan")} className="mt-6 w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-2.5 text-sm text-gray-200 transition hover:bg-white/10">View plans</button>
+                    </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/10 bg-black/35 p-6 shadow-xl backdrop-blur-xl">
+                        <h2 className="flex items-center gap-2 text-lg font-semibold"><LockKeyhole className="h-5 w-5 text-emerald-300" /> Change password</h2>
+                        <p className="mt-1 text-sm text-gray-400">Keep your account protected with a strong password.</p>
+                        <div className="mt-6 grid max-w-3xl gap-4 md:grid-cols-2">
                             <input
                                 type="password"
                                 placeholder="Old password"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                                className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/20"
                                 value={oldPassword}
                                 onChange={(e) => setOldPassword(e.target.value)}
                             />
                             <input
                                 type="password"
                                 placeholder="New password"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                                minLength={8}
+                                className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-500/20"
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                             />
-                            <InteractiveHoverButton
+                            <button
                                 type="button"
                                 onClick={handleChangePassword}
-                                className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
+                                disabled={loading}
+                                className="rounded-xl bg-emerald-400/15 px-4 py-3 text-sm font-medium text-emerald-200 ring-1 ring-emerald-400/20 transition hover:bg-emerald-400/25 disabled:opacity-50 md:col-span-2 md:w-fit"
                             >
-                                Change Password
-                            </InteractiveHoverButton>
+                                {loading ? "Updating..." : "Update password"}
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -30,6 +30,16 @@ export default function Footer() {
             <li>
               <Link href="#contact" className="hover:text-white transition">Contact</Link>
             </li>
+            <li>
+              <a
+                href="https://github.com/B-Acharekar/clustria-frontend"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-white transition"
+              >
+                GitHub repository
+              </a>
+            </li>
           </ul>
         </div>
 

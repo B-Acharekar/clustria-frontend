@@ -1,29 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { Home, Layout, Mail, Users, Package, LogIn, UserPlus } from 'lucide-react'
+import { Github, LogIn, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Navbar() {
-  const [isLanding, setIsLanding] = useState(true)
-  const pathname = usePathname()
-
-  useEffect(() => {
-    setIsLanding(pathname === '/')
-  }, [pathname])
-
-  const links = [
-    { name: 'Dashboard', icon: Home, href: '#' },
-    { name: 'Kanban', icon: Layout, href: '#' },
-    { name: 'Inbox', icon: Mail, href: '#' },
-    { name: 'Users', icon: Users, href: '#' },
-    { name: 'Products', icon: Package, href: '#' },
-    { name: 'Sign In', icon: LogIn, href: '#' },
-    { name: 'Sign Up', icon: UserPlus, href: '#' },
-  ]
-
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -41,14 +22,29 @@ export default function Navbar() {
           Clustria
         </Link>
 
-        <div className="hidden md:flex items-center space-x-6 text-sm text-gray-300">
+        <div className="hidden items-center gap-5 text-sm text-gray-300 md:flex">
           <a href="#features" className="hover:text-white transition">Features</a>
           <a href="#pricing" className="hover:text-white transition">Pricing</a>
+          <a
+            href="https://github.com/B-Acharekar/clustria-frontend"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 hover:text-white transition"
+          >
+            <Github className="h-4 w-4" /> Open source
+          </a>
           <Link
             href="/login"
-            className="px-4 py-1.5 border border-white/20 rounded-lg hover:border-white hover:text-white transition"
+            className="flex items-center gap-1.5 rounded-lg border border-white/20 px-4 py-1.5 hover:border-white hover:text-white transition"
           >
+            <LogIn className="h-4 w-4" />
             Login
+          </Link>
+          <Link
+            href="/signup"
+            className="flex items-center gap-1.5 rounded-lg bg-white px-4 py-1.5 font-medium text-black hover:bg-gray-200 transition"
+          >
+            <Sparkles className="h-4 w-4" /> Get started
           </Link>
         </div>
       </div>
