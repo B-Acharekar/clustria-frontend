@@ -20,13 +20,10 @@ import {
 } from "@/services/file";
 
 type SortKey = "name" | "size" | "date";
-type SortOrder = "asc" | "desc";
 
 interface FileListProps {
   files: FileType[];
   onFileClick?: (file: FileType) => void;
-  sortKey: SortKey;
-  sortOrder: SortOrder;
   toggleSort: (key: SortKey) => void;
   refreshFiles: () => void;
 }
@@ -34,8 +31,6 @@ interface FileListProps {
 export default function FileList({
   files,
   onFileClick,
-  sortKey,
-  sortOrder,
   toggleSort,
   refreshFiles,
 }: FileListProps) {
@@ -115,9 +110,9 @@ export default function FileList({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex min-h-0 flex-col h-full overflow-x-auto">
       {/* Table header */}
-      <div className="sticky top-0 z-10 px-4 py-2 grid grid-cols-[2fr_1fr_1fr_3fr] gap-4 text-xs font-semibold uppercase text-gray-300 bg-black/90 backdrop-blur-sm border-b border-white/20">
+      <div className="sticky top-0 z-10 min-w-[560px] px-4 py-2 grid grid-cols-[2fr_1fr_1fr_3fr] gap-4 text-xs font-semibold uppercase text-gray-300 bg-black/90 backdrop-blur-sm border-b border-white/20">
         <button
           onClick={() => toggleSort("name")}
           className="flex items-center gap-1 hover:text-white"
@@ -140,7 +135,7 @@ export default function FileList({
       </div>
 
       {/* File list */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-700 scrollbar-track-gray-900 divide-y divide-white/10">
+      <div className="flex-1 min-w-[560px] overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-700 scrollbar-track-gray-900 divide-y divide-white/10">
         {files.map((file) => (
           <div
             key={file._id}
@@ -169,7 +164,8 @@ export default function FileList({
                     actionDropdown === file._id ? null : file._id
                   )
                 }
-                className="p-1 rounded hover:bg-white/10"
+                aria-label={`Actions for ${file.filename}`}
+                className="p-2 rounded hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400"
               >
                 <MoreVertical className="w-4 h-4 text-gray-400" />
               </button>

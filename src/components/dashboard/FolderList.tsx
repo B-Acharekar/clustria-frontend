@@ -1,6 +1,6 @@
 import { FolderIcon, Trash2, Edit3, MoreHorizontal } from "lucide-react";
 import { deleteFolder, renameFolder } from "@/services/folder";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FolderListProps {
   folders: any[];
@@ -13,6 +13,10 @@ export default function FolderList({ folders: initialFolders, onOpenFolder, refr
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
+
+  useEffect(() => {
+    setFolders(initialFolders);
+  }, [initialFolders]);
 
   const handleDelete = async (folderId: string) => {
     const confirmed = confirm("Are you sure you want to delete this folder and all its contents?");
@@ -47,18 +51,18 @@ export default function FolderList({ folders: initialFolders, onOpenFolder, refr
   };
 
   return (
-    <div className="flex space-x-4 overflow-x-auto scrollbar-thin scrollbar-thumb-indigo-700 scrollbar-track-gray-900 py-2">
+    <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-indigo-700 scrollbar-track-gray-900 py-2">
       {folders.map((folder) => (
         <div
           key={folder._id}
-          className="flex-shrink-0 flex flex-col items-center p-4 bg-white/5 backdrop-blur-md hover:bg-white/10 rounded-xl min-w-[120px] relative transition"
+          className="group flex-shrink-0 flex flex-col items-center p-4 bg-white/5 backdrop-blur-md hover:bg-white/10 rounded-xl min-w-[120px] relative transition-colors"
         >
           {/* Folder click */}
           <div
             onClick={() => onOpenFolder?.(folder._id, folder.name)}
             className="flex flex-col items-center cursor-pointer"
           >
-            <FolderIcon className="w-10 h-10 text-yellow-400" />
+            <FolderIcon className="w-10 h-10 text-yellow-400 transition-transform group-hover:-translate-y-0.5" />
             <p className="mt-2 text-sm font-medium text-white truncate text-center w-full">
               {folder.name}
             </p>
@@ -66,7 +70,8 @@ export default function FolderList({ folders: initialFolders, onOpenFolder, refr
 
           {/* Three dots menu */}
           <button
-            className="absolute top-2 right-2 p-1 hover:bg-white/20 rounded"
+            aria-label={`Actions for ${folder.name}`}
+            className="absolute top-2 right-2 p-1 rounded opacity-60 hover:bg-white/20 hover:opacity-100 transition"
             onClick={(e) => {
               e.stopPropagation();
               setMenuOpenFor(menuOpenFor === folder._id ? null : folder._id);

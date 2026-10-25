@@ -2,7 +2,7 @@
 import { Folder as FolderIcon, X, ChevronDown, Clock, Star, Trash2 } from "lucide-react";
 import clsx from "clsx";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import StorageMeter from "./StorageMeter";
 import * as folderService from "@/services/folder";
 import Link from "next/link";
@@ -19,27 +19,29 @@ interface FolderType {
 
 export default function InnerSidebar({ collapsed, onClose }: InnerSidebarProps) {
   const [folders, setFolders] = useState<FolderType[]>([]);
+  const [foldersLoading, setFoldersLoading] = useState(true);
   const [foldersOpen, setFoldersOpen] = useState(true); // toggle for folder dropdown
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchFolders = async () => {
       try {
         const { folders } = await folderService.getAllFoldersForSidebar();
         setFolders(folders);
+        setFoldersLoading(false);
 
         const defaultNames = ["Documents", "Images", "Videos"];
         const existingNames = folders.map((f: FolderType) => f.name);
+        const missingNames = defaultNames.filter((name) => !existingNames.includes(name));
 
-        for (const name of defaultNames) {
-          if (!existingNames.includes(name)) {
-            await folderService.createFolder(name);
-          }
+        if (missingNames.length > 0) {
+          await Promise.all(missingNames.map((name) => folderService.createFolder(name)));
+          const updated = await folderService.getAllFoldersForSidebar();
+          setFolders(updated.folders);
         }
-
-        const updated = await folderService.getAllFoldersForSidebar();
-        setFolders(updated.folders);
       } catch (err) {
+        setFoldersLoading(false);
         console.error("Failed to fetch or create default folders", err);
       }
     };
@@ -50,6 +52,11 @@ export default function InnerSidebar({ collapsed, onClose }: InnerSidebarProps) 
     router.push(`/folder?folder=${id}`);
     if (onClose) onClose();
   };
+
+  const quickLinkClass = (href: string) => clsx(
+    "flex items-center w-full px-3 py-2 rounded-lg transition text-left",
+    pathname === href ? "bg-white/10 text-white" : "text-gray-300 hover:bg-white/10"
+  );
 
   return (
     <div
@@ -90,11 +97,21 @@ export default function InnerSidebar({ collapsed, onClose }: InnerSidebarProps) 
           </button>
           {foldersOpen && (
             <div className="ml-6 mt-1 space-y-1">
+              {foldersLoading && (
+                <div className="space-y-2 px-3 py-2" aria-label="Loading folders">
+                  {[1, 2, 3].map((item) => (
+                    <div key={item} className="h-8 animate-pulse rounded-lg bg-white/5" />
+                  ))}
+                </div>
+              )}
+              {!foldersLoading && folders.length === 0 && (
+                <p className="px-3 py-2 text-xs text-gray-500">No folders yet</p>
+              )}
               {folders.map(folder => (
                 <button
                   key={folder._id}
                   onClick={() => handleOpenFolder(folder._id)}
-                  className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 text-left text-sm"
+                  className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 text-left text-sm transition"
                 >
                   <FolderIcon className="w-4 h-4 text-blue-400 mr-2" />
                   {folder.name}
@@ -106,13 +123,13 @@ export default function InnerSidebar({ collapsed, onClose }: InnerSidebarProps) 
 
         {/* Quick Links */}
         <div className="mt-3 space-y-1">
-          <Link href={'/Recent'} className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
+          <Link href={'/Recent'} className={quickLinkClass('/Recent')}>
             <Clock className="w-4 h-4 text-gray-400 mr-2" /> Recent
           </Link>
-          <Link href={'/Starred'} className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
+          <Link href={'/Starred'} className={quickLinkClass('/Starred')}>
             <Star className="w-4 h-4 text-yellow-400 mr-2" /> Starred
           </Link>
-          <Link  href={'/trash/'} className="flex items-center w-full px-3 py-2 rounded-lg hover:bg-white/10 transition text-left">
+          <Link href={'/trash/'} className={quickLinkClass('/trash/')}>
             <Trash2 className="w-4 h-4 text-red-400 mr-2" /> Trash
           </Link>
         </div>

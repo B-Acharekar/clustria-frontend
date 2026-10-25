@@ -19,6 +19,8 @@ export default function DashboardPage() {
 
   const currentFolderId =
     folderPath.length > 0 ? folderPath[folderPath.length - 1].id : "";
+  const currentFolderName =
+    folderPath.length > 0 ? folderPath[folderPath.length - 1].name : "Your workspace";
 
   const triggerRefresh = () => setRefreshTrigger(prev => prev + 1);
 
@@ -44,8 +46,9 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-[#0f0f0f] via-[#1a1a1a] to-[#0f0f0f] text-white">
+    <div className="flex h-screen min-w-0 overflow-hidden bg-gradient-to-br from-[#0f0f0f] via-[#1a1a1a] to-[#0f0f0f] text-white">
       <motion.div
+        className="hidden shrink-0 sm:block"
         initial={{ opacity: 0, x: -40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -61,16 +64,17 @@ export default function DashboardPage() {
         <InnerSidebar collapsed={collapsed} />
       </motion.div>
 
-      <motion.main className="flex-1 flex flex-col overflow-hidden p-6">
+      <motion.main className="min-w-0 flex-1 flex flex-col overflow-hidden p-3 sm:p-6">
         <ActionBar
           currentFolderId={currentFolderId}
+          currentFolderName={currentFolderName}
           refresh={triggerRefresh}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
 
         <motion.div
-          className="flex-1 flex flex-col rounded-2xl bg-black/40 shadow-lg backdrop-blur-xl border border-white/10 p-6 mt-6 overflow-hidden"
+          className="min-h-0 flex-1 flex flex-col rounded-2xl bg-black/40 shadow-lg backdrop-blur-xl border border-white/10 p-3 sm:p-6 overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}

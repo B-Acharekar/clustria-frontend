@@ -35,6 +35,9 @@ export default function OuterSidebar({
       {/* Home */}
       <Link
         href={"/dashboard"}
+        onClick={onHomeClick}
+        aria-label="Go to dashboard"
+        title="Home"
         className="group flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition-all w-full"
       >
         <Home className="w-5 h-5 text-gray-300 group-hover:text-blue-400 transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-200" />
@@ -44,7 +47,9 @@ export default function OuterSidebar({
       </Link>
 
       <Link 
-        href={`/folder/${currentFolderId || ""}`}
+        href={currentFolderId ? `/folder/${currentFolderId}` : "/folder"}
+        aria-label="Open folders"
+        title="Folders"
         className="group flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition-all w-full"
       >
         <Folder className="w-5 h-5 text-gray-300 group-hover:text-yellow-400 transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-200" />
@@ -55,6 +60,8 @@ export default function OuterSidebar({
 
       <Link
         href="/settings"
+        aria-label="Open settings"
+        title="Settings"
         className="group flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition-all w-full"
         >
           <Settings className="w-5 h-5 text-gray-300 group-hover:text-yellow-400 transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-200" />
@@ -68,6 +75,8 @@ export default function OuterSidebar({
       {/* Collapse button */}
       <button
         onClick={() => setCollapsed(!collapsed)}
+        aria-label={collapsed ? "Show navigation" : "Hide navigation"}
+        title={collapsed ? "Show navigation" : "Hide navigation"}
         className="flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition w-full"
       >
         {collapsed ? (
