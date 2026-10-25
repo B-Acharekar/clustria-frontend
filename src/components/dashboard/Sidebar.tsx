@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Home,
   Folder,
@@ -7,6 +9,7 @@ import {
 } from "lucide-react";
 import clsx from "clsx";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function OuterSidebar({
   collapsed,
@@ -19,6 +22,16 @@ export default function OuterSidebar({
   currentFolderId?: string; 
   onHomeClick?: () => void;
 }) {
+  const pathname = usePathname();
+  const isHome = pathname === "/dashboard";
+  const isFolders = pathname.startsWith("/folder") || pathname.startsWith("/files");
+  const isSettings = pathname === "/settings" || pathname === "/profile";
+
+  const itemClass = (active: boolean) => clsx(
+    "group flex w-full flex-col items-center justify-center gap-1 rounded-lg p-2 transition-all",
+    active ? "bg-[#222]" : "hover:bg-[#222]"
+  );
+
   return (
     <div
       className={clsx(
@@ -38,10 +51,10 @@ export default function OuterSidebar({
         onClick={onHomeClick}
         aria-label="Go to dashboard"
         title="Home"
-        className="group flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition-all w-full"
+        className={itemClass(isHome)}
       >
-        <Home className="w-5 h-5 text-gray-300 group-hover:text-blue-400 transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-200" />
-        <span className="text-[10px] text-gray-400 group-hover:text-blue-400 transition-colors duration-200">
+        <Home className={clsx("h-5 w-5 transform transition-all duration-200 group-hover:-translate-y-0.5 group-hover:scale-110", isHome ? "text-blue-400" : "text-gray-300 group-hover:text-blue-400")} />
+        <span className={clsx("text-[10px] transition-colors duration-200", isHome ? "text-blue-400" : "text-gray-400 group-hover:text-blue-400")}>
           Home
         </span>
       </Link>
@@ -50,10 +63,10 @@ export default function OuterSidebar({
         href={currentFolderId ? `/folder/${currentFolderId}` : "/folder"}
         aria-label="Open folders"
         title="Folders"
-        className="group flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition-all w-full"
+        className={itemClass(isFolders)}
       >
-        <Folder className="w-5 h-5 text-gray-300 group-hover:text-yellow-400 transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-200" />
-        <span className="text-[10px] text-gray-400 group-hover:text-yellow-400 transition-colors duration-200">
+        <Folder className={clsx("h-5 w-5 transform transition-all duration-200 group-hover:-translate-y-0.5 group-hover:scale-110", isFolders ? "text-yellow-400" : "text-gray-300 group-hover:text-yellow-400")} />
+        <span className={clsx("text-[10px] transition-colors duration-200", isFolders ? "text-yellow-400" : "text-gray-400 group-hover:text-yellow-400")}>
           Folders
         </span>
       </Link>
@@ -62,10 +75,10 @@ export default function OuterSidebar({
         href="/settings"
         aria-label="Open settings"
         title="Settings"
-        className="group flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-[#222] transition-all w-full"
+        className={itemClass(isSettings)}
         >
-          <Settings className="w-5 h-5 text-gray-300 group-hover:text-yellow-400 transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-200" />
-          <span className="text-[10px] text-gray-400 group-hover:text-yellow-400 transition-colors duration-200">
+          <Settings className={clsx("h-5 w-5 transform transition-all duration-200 group-hover:-translate-y-0.5 group-hover:scale-110", isSettings ? "text-yellow-400" : "text-gray-300 group-hover:text-yellow-400")} />
+          <span className={clsx("text-[10px] transition-colors duration-200", isSettings ? "text-yellow-400" : "text-gray-400 group-hover:text-yellow-400")}>
             Settings
           </span>
       </Link>

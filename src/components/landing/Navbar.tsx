@@ -1,10 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Github, LogIn, Sparkles } from 'lucide-react'
+import { Github, LogIn, Menu, Sparkles, X } from 'lucide-react'
+import { useState } from 'react'
 import Link from 'next/link'
 
 export default function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false)
+
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -21,6 +24,16 @@ export default function Navbar() {
         >
           Clustria
         </Link>
+
+        <button
+          type="button"
+          onClick={() => setMobileOpen((open) => !open)}
+          aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={mobileOpen}
+          className="rounded-lg border border-white/10 p-2 text-gray-300 transition hover:bg-white/10 hover:text-white md:hidden"
+        >
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
 
         <div className="hidden items-center gap-5 text-sm text-gray-300 md:flex">
           <a href="#features" className="hover:text-white transition">Features</a>
@@ -48,6 +61,18 @@ export default function Navbar() {
           </Link>
         </div>
       </div>
+
+      {mobileOpen && (
+        <div className="border-t border-white/10 bg-black/90 px-6 py-4 md:hidden">
+          <div className="flex flex-col gap-3 text-sm text-gray-300">
+            <a href="#features" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white">Features</a>
+            <a href="#pricing" onClick={() => setMobileOpen(false)} className="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white">Pricing</a>
+            <a href="https://github.com/B-Acharekar/clustria-frontend" target="_blank" rel="noreferrer" className="rounded-lg px-3 py-2 hover:bg-white/10 hover:text-white">Open source on GitHub</a>
+            <Link href="/login" onClick={() => setMobileOpen(false)} className="rounded-lg border border-white/20 px-3 py-2 text-center hover:border-white hover:text-white">Login</Link>
+            <Link href="/signup" onClick={() => setMobileOpen(false)} className="rounded-lg bg-white px-3 py-2 text-center font-medium text-black hover:bg-gray-200">Get started</Link>
+          </div>
+        </div>
+      )}
 
 
     </motion.nav>

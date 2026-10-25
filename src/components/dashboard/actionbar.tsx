@@ -1,7 +1,7 @@
 "use client";
 
 import { Search, Upload, Plus, LogOut, User, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getProfile, logout } from "@/services/auth";
 import { createFolder } from "@/services/folder";
@@ -27,7 +27,28 @@ export default function ActionBar({
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!open) return;
+
+    const closeMenu = (event: PointerEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    document.addEventListener("pointerdown", closeMenu);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeMenu);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
   
   useEffect(() => {
       const fetchProfile = async () => {
@@ -101,7 +122,7 @@ export default function ActionBar({
         </div>
 
         {/* Profile Button */}
-        <div className="relative shrink-0 self-end sm:self-auto">
+        <div ref={profileMenuRef} className="relative shrink-0 self-end sm:self-auto">
           <button
             onClick={() => setOpen(!open)}
             aria-label="Open account menu"
@@ -120,7 +141,10 @@ export default function ActionBar({
           {open && (
             <div className="absolute right-0 top-14 z-20 w-44 overflow-hidden rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-xl">
               <button
-                onClick={() => router.push("/profile")}
+                onClick={() => {
+                  setOpen(false);
+                  router.push("/profile");
+                }}
                 className="flex w-full items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:bg-blue-500 hover:text-white transition-all duration-200"
               >
                 <User className="h-4 w-4" />

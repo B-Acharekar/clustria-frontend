@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Upload, Cpu, Cloud } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Upload, Cpu, Cloud, LoaderCircle } from "lucide-react";
 import { uploadFile, uploadFileAI } from "@/services/file";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -19,26 +19,45 @@ export default function UploadModal({
   refresh,
 }: UploadModalProps) {
   const [aiCount, setAiCount] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !uploading) onClose();
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [open, onClose, uploading]);
 
   const handleFileSelect = async (
     e: React.ChangeEvent<HTMLInputElement>,
     isAI: boolean
   ) => {
-    if (!e.target.files?.length) return;
+    if (!e.target.files?.length || uploading) return;
     const file = e.target.files[0];
+    setError("");
+    setUploading(true);
 
-    if (isAI) {
-      if (aiCount >= 5) {
-        alert("You have reached the daily AI upload limit (5).");
-        return;
+    try {
+      if (isAI) {
+        if (aiCount >= 5) {
+          setError("You have reached the daily AI upload limit (5).");
+          return;
+        }
+        await uploadFileAI(file, currentFolderId);
+        setAiCount((prev) => prev + 1);
+      } else {
+        await uploadFile(file, "AES", currentFolderId);
       }
-      await uploadFileAI(file, currentFolderId);
-      setAiCount((prev) => prev + 1);
-    } else {
-      await uploadFile(file, "AES", currentFolderId);
+      await refresh();
+      onClose();
+    } catch (err: any) {
+      setError(err.response?.data?.msg || "Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
     }
-    await refresh();
-    onClose();
   };
 
   return (
@@ -65,6 +84,9 @@ export default function UploadModal({
                        border border-white/20 shadow-[0_8px_60px_rgba(0,0,0,0.7)]
                        bg-gradient-to-br from-white/10 via-white/5 to-white/2
                        backdrop-blur-2xl p-8"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="upload-dialog-title"
           >
             <div className="flex flex-col items-center gap-6 text-center">
               {/* Icon */}
@@ -75,12 +97,13 @@ export default function UploadModal({
                 <Upload className="w-11 h-11 text-white drop-shadow-[0_2px_8px_rgba(255,255,255,0.6)]" />
               </div>
 
-              <h2 className="text-2xl font-semibold text-white drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]">
+              <h2 id="upload-dialog-title" className="text-2xl font-semibold text-white drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]">
                 Upload Files
               </h2>
               <p className="text-sm text-gray-300/80 max-w-xs leading-relaxed">
                 Upload normal or AI files. AI uploads are limited to 5 per day.
               </p>
+              {error && <p className="w-full rounded-lg border border-red-400/20 bg-red-400/10 px-3 py-2 text-left text-xs text-red-200">{error}</p>}
 
               {/* Upload Buttons */}
               <div className="flex flex-col gap-4 w-full">
@@ -88,12 +111,14 @@ export default function UploadModal({
                                    bg-white/10 border border-white/20
                                    text-white cursor-pointer
                                    hover:bg-white/20 hover:shadow-lg
+                                   aria-disabled={uploading}
                                    transition-all duration-300">
                   <Cloud className="w-5 h-5" />
                   Normal Upload
-                  <input
+                    <input
                     type="file"
                     hidden
+                      disabled={uploading}
                     onChange={(e) => handleFileSelect(e, false)}
                   />
                 </label>
@@ -102,12 +127,14 @@ export default function UploadModal({
                                    bg-blue-600 border border-white/20
                                    text-white cursor-pointer
                                    hover:bg-blue-500 hover:shadow-lg
+                                   aria-disabled={uploading}
                                    transition-all duration-300">
                   <Cpu className="w-5 h-5" />
                   AI Upload ({aiCount}/5 today)
-                  <input
+                    <input
                     type="file"
                     hidden
+                      disabled={uploading}
                     onChange={(e) => handleFileSelect(e, true)}
                   />
                 </label>
@@ -116,12 +143,13 @@ export default function UploadModal({
               {/* Cancel Button */}
               <button
                 onClick={onClose}
+                disabled={uploading}
                 className="mt-4 w-full py-2.5 rounded-xl 
                            bg-red-500 border border-white/20
                            text-white font-medium hover:bg-red-600
                            hover:shadow-lg transition-all duration-300"
               >
-                Cancel
+                {uploading ? <><LoaderCircle className="mr-2 inline h-4 w-4 animate-spin" /> Uploading...</> : "Cancel"}
               </button>
             </div>
           </motion.div>
