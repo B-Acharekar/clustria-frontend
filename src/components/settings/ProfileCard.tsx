@@ -46,14 +46,14 @@ export default function ProfileCard() {
 
   return (
     <motion.div
-      className="rounded-2xl bg-black/50 shadow-lg backdrop-blur-xl border border-white/10 p-8 space-y-6"
+      className="rounded-xl border border-white/10 bg-[#161b22] p-6 space-y-6 sm:p-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
       {/* Section Header */}
       <div>
-        <h2 className="text-2xl font-semibold">Profile</h2>
+        <h2 className="text-xl font-semibold">Profile</h2>
         <p className="text-gray-400 text-sm mt-1">
           Manage your personal information and avatar.
         </p>
@@ -61,7 +61,7 @@ export default function ProfileCard() {
 
       {/* Avatar */}
       <div className="flex items-center space-x-6">
-        <div className="w-20 h-20 rounded-full overflow-hidden border border-gray-700">
+        <div className="h-20 w-20 overflow-hidden rounded-full border border-white/15 bg-white/10">
           {avatarPreview || user?.avatar ? (
             <img
               src={avatarPreview || user?.avatar}
@@ -69,13 +69,13 @@ export default function ProfileCard() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gray-800 flex items-center justify-center text-gray-400 text-sm">
+            <div className="flex h-full w-full items-center justify-center text-sm text-gray-400">
               No Avatar
             </div>
           )}
         </div>
         <div>
-          <label className="px-4 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium cursor-pointer transition">
+          <label className="cursor-pointer rounded-lg border border-white/10 bg-white/[0.06] px-4 py-1.5 text-sm font-medium transition hover:bg-white/10">
             Change
             <input
               type="file"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { motion } from "framer-motion";
@@ -28,14 +28,17 @@ export default function SettingsPage() {
   const notificationsRef = useRef<HTMLDivElement | null>(null);
   const preferencesRef = useRef<HTMLDivElement | null>(null);
   
-  const sectionRefs: Record<string, React.RefObject<HTMLDivElement | null>> = {
-    profile: profileRef,
-    security: securityRef,
-    plan: planRef,
-    apps: appsRef,
-    notifications: notificationsRef,
-    preferences: preferencesRef,
-  };
+  const sectionRefs = useMemo<Record<string, React.RefObject<HTMLDivElement | null>>>(
+    () => ({
+      profile: profileRef,
+      security: securityRef,
+      plan: planRef,
+      apps: appsRef,
+      notifications: notificationsRef,
+      preferences: preferencesRef,
+    }),
+    []
+  );
   
   const userPlan = {
     name: "Free",
@@ -75,11 +78,12 @@ export default function SettingsPage() {
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [sectionRefs]);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-[#0f0f0f] via-[#1a1a1a] to-[#0f0f0f] text-white">
+    <div className="flex h-screen overflow-hidden bg-[#0d1117] text-white">
       <motion.div
+        className="sticky top-0 h-screen shrink-0"
         initial={{ opacity: 0, x: -40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
@@ -87,8 +91,8 @@ export default function SettingsPage() {
         <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       </motion.div>
 
-      <div className="flex-1 flex overflow-hidden">
-        <div className="sticky top-0 h-screen flex-shrink-0">
+      <div className="min-w-0 flex-1 flex overflow-hidden">
+        <div className="sticky top-0 h-screen shrink-0">
           <SettingsInnerSidebar
             current={activeSection}
             onSelect={handleScrollTo}
@@ -97,7 +101,7 @@ export default function SettingsPage() {
         </div>
 
         <motion.main
-          className="flex-1 overflow-y-auto p-6 space-y-16"
+          className="min-w-0 flex-1 overflow-y-auto bg-[#0d1117] p-4 space-y-8 sm:p-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}

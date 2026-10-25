@@ -22,13 +22,13 @@ export default function SettingsInnerSidebar({ current, onSelect, collapsed }: P
   return (
     <div
       className={clsx(
-        "bg-[#111]/70 backdrop-blur-xl text-white h-screen flex flex-col border-r border-white/10 shadow-lg transition-all duration-300",
+        "bg-[#161b22] text-white h-screen flex flex-col border-r border-white/10 transition-all duration-300",
         collapsed ? "w-0 overflow-hidden" : "w-56"
       )}
     >
       {/* Heading */}
       {!collapsed && (
-        <div className="px-4 py-4 text-xl font-semibold border-b border-white/10">
+        <div className="border-b border-white/10 px-4 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-gray-400">
           Settings
         </div>
       )}
@@ -46,7 +46,7 @@ export default function SettingsInnerSidebar({ current, onSelect, collapsed }: P
                 className={clsx(
                   "flex items-center gap-3 px-4 py-3 w-full text-left rounded-r-lg transition-all duration-200",
                   isActive
-                    ? "bg-indigo-600 text-white border-l-4 border-indigo-500 font-medium"
+                    ? "bg-white/10 text-white border-l-4 border-blue-400 font-medium"
                     : "text-gray-300 hover:bg-white/10"
                 )}
               >

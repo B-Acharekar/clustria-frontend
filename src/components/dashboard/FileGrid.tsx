@@ -133,7 +133,7 @@ export default function FileGrid({
             {filteredFolders.length} {filteredFolders.length === 1 ? "folder" : "folders"}
           </span>
         </div>
-        <div className="flex space-x-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900 py-2">
+        <div className="py-2">
           <FolderList
             folders={filteredFolders}
             onOpenFolder={onOpenFolder}

@@ -179,7 +179,7 @@ export default function ProfilePage() {
                     <div className="rounded-xl border border-white/10 bg-[#161b22] p-6 sm:p-8">
                     <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                         <div className="flex items-center gap-5">
-                        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-3xl border border-white/15 bg-white/10">
+                        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-white/15 bg-white/10">
                             {avatar ? (
                                 <img src={avatar} alt="Avatar" className="h-full w-full object-cover" />
                             ) : (

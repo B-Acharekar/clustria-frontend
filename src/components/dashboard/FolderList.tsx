@@ -1,6 +1,6 @@
 import { FolderIcon, Trash2, Edit3, MoreHorizontal } from "lucide-react";
 import { deleteFolder, renameFolder } from "@/services/folder";
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 
 interface FolderListProps {
   folders: any[];
@@ -11,12 +11,35 @@ interface FolderListProps {
 export default function FolderList({ folders: initialFolders, onOpenFolder, refresh }: FolderListProps) {
   const [folders, setFolders] = useState(initialFolders);
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
 
   useEffect(() => {
     setFolders(initialFolders);
   }, [initialFolders]);
+
+  useEffect(() => {
+    if (!menuOpenFor) return;
+    const closeMenuOnScroll = () => setMenuOpenFor(null);
+    window.addEventListener("scroll", closeMenuOnScroll, true);
+    return () => window.removeEventListener("scroll", closeMenuOnScroll, true);
+  }, [menuOpenFor]);
+
+  const toggleMenu = (event: MouseEvent<HTMLButtonElement>, folderId: string) => {
+    event.stopPropagation();
+    if (menuOpenFor === folderId) {
+      setMenuOpenFor(null);
+      return;
+    }
+
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setMenuPosition({
+      top: buttonRect.bottom + 6,
+      left: Math.min(window.innerWidth - 140, Math.max(8, buttonRect.right - 128)),
+    });
+    setMenuOpenFor(folderId);
+  };
 
   const handleDelete = async (folderId: string) => {
     const confirmed = confirm("Are you sure you want to delete this folder and all its contents?");
@@ -51,7 +74,7 @@ export default function FolderList({ folders: initialFolders, onOpenFolder, refr
   };
 
   return (
-    <div className="flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-indigo-700 scrollbar-track-gray-900 py-2">
+    <div className="flex gap-3 overflow-x-auto overflow-y-hidden py-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {folders.map((folder) => (
         <div
           key={folder._id}
@@ -72,17 +95,17 @@ export default function FolderList({ folders: initialFolders, onOpenFolder, refr
           <button
             aria-label={`Actions for ${folder.name}`}
             className="absolute top-2 right-2 p-1 rounded opacity-60 hover:bg-white/20 hover:opacity-100 transition"
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuOpenFor(menuOpenFor === folder._id ? null : folder._id);
-            }}
+            onClick={(event) => toggleMenu(event, folder._id)}
           >
             <MoreHorizontal className="w-5 h-5 text-gray-300" />
           </button>
 
           {/* Dropdown menu */}
           {menuOpenFor === folder._id && (
-            <div className="absolute top-10 right-2 flex flex-col gap-2 bg-gray-800 rounded-lg shadow-xl text-white text-sm py-2 px-3 z-10 w-32">
+            <div
+              className="fixed z-[100] flex w-32 flex-col gap-2 rounded-lg border border-white/10 bg-gray-800 px-3 py-2 text-sm text-white shadow-xl"
+              style={{ top: menuPosition.top, left: menuPosition.left }}
+            >
               <button
                 className="flex items-center gap-2 py-1 px-2 hover:bg-indigo-600 hover:text-white rounded"
                 onClick={(e) => {
