@@ -1,6 +1,7 @@
 import { FolderIcon, Trash2, Edit3, MoreHorizontal } from "lucide-react";
 import { deleteFolder, renameFolder } from "@/services/folder";
 import { MouseEvent, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface FolderListProps {
   folders: any[];
@@ -101,33 +102,37 @@ export default function FolderList({ folders: initialFolders, onOpenFolder, refr
           </button>
 
           {/* Dropdown menu */}
-          {menuOpenFor === folder._id && (
+          {menuOpenFor === folder._id && typeof document !== "undefined" && createPortal(
             <div
+              role="menu"
               className="fixed z-[100] flex w-32 flex-col gap-2 rounded-lg border border-white/10 bg-gray-800 px-3 py-2 text-sm text-white shadow-xl"
               style={{ top: menuPosition.top, left: menuPosition.left }}
             >
               <button
-                className="flex items-center gap-2 py-1 px-2 hover:bg-indigo-600 hover:text-white rounded"
-                onClick={(e) => {
-                  e.stopPropagation();
+                role="menuitem"
+                className="flex items-center gap-2 rounded px-2 py-1 hover:bg-indigo-600 hover:text-white"
+                onClick={(event) => {
+                  event.stopPropagation();
                   setEditingFolderId(folder._id);
                   setNewName(folder.name);
                   setMenuOpenFor(null);
                 }}
               >
-                <Edit3 className="w-4 h-4" /> Rename
+                <Edit3 className="h-4 w-4" /> Rename
               </button>
               <button
-                className="flex items-center gap-2 py-1 px-2 hover:bg-red-600 hover:text-white rounded"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(folder._id);
+                role="menuitem"
+                className="flex items-center gap-2 rounded px-2 py-1 hover:bg-red-600 hover:text-white"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void handleDelete(folder._id);
                   setMenuOpenFor(null);
                 }}
               >
-                <Trash2 className="w-4 h-4" /> Delete
+                <Trash2 className="h-4 w-4" /> Delete
               </button>
-            </div>
+            </div>,
+            document.body
           )}
 
           {/* Inline rename */}

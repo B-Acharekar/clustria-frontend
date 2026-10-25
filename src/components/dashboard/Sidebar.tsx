@@ -25,7 +25,7 @@ export default function OuterSidebar({
   const pathname = usePathname();
   const isHome = pathname === "/dashboard";
   const isFolders = pathname.startsWith("/folder") || pathname.startsWith("/files");
-  const isSettings = pathname === "/settings" || pathname === "/profile";
+  const isSettings = pathname === "/settings";
 
   const itemClass = (active: boolean) => clsx(
     "group flex w-full flex-col items-center justify-center gap-1 rounded-lg p-2 transition-all",
