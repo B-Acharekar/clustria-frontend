@@ -57,22 +57,51 @@ export default function ActionBar({
   };
 
   return (
-    <div className="relative mb-5 flex flex-col gap-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-blue-300/80">
-            Clustria Drive
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            {currentFolderName || "Your workspace"}
-          </h1>
-          <p className="mt-1 text-sm text-gray-400">
-            Keep your files close, organized, and easy to find.
-          </p>
+    <div className="relative mb-4 flex flex-col gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        {/* Search Bar */}
+        <div className="relative min-w-0 flex-1">
+          <input
+            type="text"
+            placeholder={currentFolderName ? `Search in ${currentFolderName}...` : "Search files..."}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            aria-label="Search files"
+            className="w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-3 pl-11 pr-11 text-sm placeholder-gray-400 text-white shadow-md backdrop-blur-md focus:outline-none focus:border-blue-400/50 focus:ring-2 focus:ring-blue-500/30 transition"
+          />
+          <Search className="pointer-events-none absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              aria-label="Clear search"
+              className="absolute right-3 top-3 rounded-md p-0.5 text-gray-400 hover:bg-white/10 hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex shrink-0 gap-3">
+          <button
+            onClick={() => setUploadModalOpen(true)}
+            className="flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-medium text-black shadow-sm hover:bg-zinc-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-white/50 transition"
+          >
+            <Upload size={18} />
+            Upload
+          </button>
+
+          <button
+            onClick={() => setCreateModalOpen(true)}
+            className="flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-300 border border-zinc-700 hover:bg-zinc-800 hover:text-white shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400/60 transition"
+          >
+            <Plus size={18} />
+            Create
+          </button>
         </div>
 
         {/* Profile Button */}
-        <div className="relative shrink-0">
+        <div className="relative shrink-0 self-end sm:self-auto">
           <button
             onClick={() => setOpen(!open)}
             aria-label="Open account menu"
@@ -109,48 +138,7 @@ export default function ActionBar({
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative w-full">
-        <input
-          type="text"
-          placeholder="Search files..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          aria-label="Search files"
-          className="w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-3 pl-11 pr-11 text-sm placeholder-gray-400 text-white shadow-md backdrop-blur-md focus:outline-none focus:border-blue-400/50 focus:ring-2 focus:ring-blue-500/30 transition"
-        />
-        <Search className="pointer-events-none absolute left-3 top-3 h-5 w-5 text-gray-400" />
-        {searchTerm && (
-          <button
-            onClick={() => setSearchTerm("")}
-            aria-label="Clear search"
-            className="absolute right-3 top-3 rounded-md p-0.5 text-gray-400 hover:bg-white/10 hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-3">
-      <button
-        onClick={() => setUploadModalOpen(true)}
-        className="flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-medium text-black shadow-sm hover:bg-zinc-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-white/50 transition"
-      >
-        <Upload size={18} />
-        Upload
-      </button>
-
-      <button
-        onClick={() => setCreateModalOpen(true)}
-        className="flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-300 border border-zinc-700 hover:bg-zinc-800 hover:text-white shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400/60 transition"
-      >
-        <Plus size={18} />
-        Create
-      </button>
-      </div>
-
-    <UploadModal
+      <UploadModal
       open={uploadModalOpen}
       onClose={() => setUploadModalOpen(false)}
       currentFolderId={currentFolderId}
