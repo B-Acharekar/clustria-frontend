@@ -7,6 +7,7 @@ import { getProfile, logout } from "@/services/auth";
 import { createFolder } from "@/services/folder";
 import CreateModal from "./CreateFolderModal";
 import UploadModal from "./UploadModal";
+import { useToast } from "@/components/ui/Toast";
 
 interface ActionBarProps {
   currentFolderId?: string;
@@ -29,6 +30,7 @@ export default function ActionBar({
   const [avatar, setAvatar] = useState<string | null>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!open) return;
@@ -167,6 +169,10 @@ export default function ActionBar({
       onClose={() => setUploadModalOpen(false)}
       currentFolderId={currentFolderId}
       refresh={refresh}
+      onUploadComplete={(result) => {
+        const folderName = result?.organizedFolder?.name;
+        toast(folderName ? `AI upload organized into ${folderName}.` : "Upload completed.");
+      }}
     />
     
       {/* Create Modal */}

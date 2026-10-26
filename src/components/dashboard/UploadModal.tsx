@@ -10,6 +10,7 @@ interface UploadModalProps {
   onClose: () => void;
   currentFolderId?: string;
   refresh: () => void;
+  onUploadComplete?: (result: any) => void;
 }
 
 export default function UploadModal({
@@ -17,10 +18,19 @@ export default function UploadModal({
   onClose,
   currentFolderId,
   refresh,
+  onUploadComplete,
 }: UploadModalProps) {
   const [aiCount, setAiCount] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (open && typeof window !== "undefined") {
+      const today = new Date().toISOString().slice(0, 10);
+      const savedCount = Number(window.localStorage.getItem(`clustria-ai-uploads:${today}`) || 0);
+      setAiCount(Math.min(savedCount, 5));
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -46,15 +56,22 @@ export default function UploadModal({
           setError("You have reached the daily AI upload limit (5).");
           return;
         }
-        await uploadFileAI(file, currentFolderId);
-        setAiCount((prev) => prev + 1);
+        const result = await uploadFileAI(file, currentFolderId);
+        const nextCount = aiCount + 1;
+        setAiCount(nextCount);
+        if (typeof window !== "undefined") {
+          const today = new Date().toISOString().slice(0, 10);
+          window.localStorage.setItem(`clustria-ai-uploads:${today}`, String(nextCount));
+        }
+        onUploadComplete?.(result);
       } else {
-        await uploadFile(file, "AES", currentFolderId);
+        const result = await uploadFile(file, "AES", currentFolderId);
+        onUploadComplete?.(result);
       }
       await refresh();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.msg || "Upload failed. Please try again.");
+      setError(err.response?.data?.error || err.response?.data?.msg || "Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
