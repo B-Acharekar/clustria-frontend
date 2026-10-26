@@ -54,7 +54,7 @@ export default function Hero() {
           transition={{ delay: 0.55, duration: 0.6 }}
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.96 }}
-          className="inline-block mt-10"
+          className="mx-auto mt-10 block w-fit"
         >
           <Link
             href="/signup"
@@ -64,7 +64,7 @@ export default function Hero() {
             Start for Free <ArrowRight className="h-4 w-4" />
           </Link>
         </motion.div>
-        <Link href="/login" className="mt-5 inline-block text-sm text-gray-400 transition hover:text-white">
+        <Link href="/login" className="mx-auto mt-5 block w-fit text-sm text-gray-400 transition hover:text-white">
           Already have an account? Open your workspace →
         </Link>
       </div>
